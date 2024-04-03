@@ -2,6 +2,7 @@ from anytree import Node, RenderTree
 from anytree.exporter import DictExporter
 from anytree.importer import DictImporter
 from anytree import Node, RenderTree
+import json
 #Hàm in cây
 def print_tree(tree_root):
     result = "Cây:\n"
@@ -14,7 +15,7 @@ def create_tree(input_mapping):
     root = None
     current_parent = None
     for key, value in input_mapping.items():
-        if value == "and":
+        if value == "and" or value == "or":
             if root is None:
                 root = Node(key)
                 current_parent = root
@@ -49,20 +50,22 @@ def create_subtree_from_leaf(root, key1, subtree_input_mapping):
             parent = target_leaf
             if key != target_leaf.name:
                 if value == "and":
-                    root = Node(key)
+                    root = Node(key + "()".format(value))
                     parent = root
                 else:
                     Node(key, parent=parent)
         return parent
     else:
         return None
- 
+    
 #Hàm chuyển định dạng cây về dict và ngược lại
 def tree_to_dict(tree_root):
     exporter = DictExporter()
     tree_dict = exporter.export(tree_root)
-    return tree_dict
+    return json.dumps(tree_dict)
+    #return tree_dict
 def dict_to_tree(tree_dict):
+    tree_dict = json.loads(tree_dict)
     importer = DictImporter()
     root_node = importer.import_(tree_dict)
     return root_node
